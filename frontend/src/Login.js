@@ -6,33 +6,43 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+  try {
+    const response = await API.post("/users/login", {
+      email,
+      password,
+    });
 
-    try {
-      const response = await API.post("/users/login", {
-        email,
-        password,
-      });
+    console.log("Login response:", response.data);
 
-      const { token, user } = response.data;
+    const token = response.data.token;
+    const user = response.data.user || response.data.data || response.data;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      if (user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
-
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Login failed");
+    if (!token) {
+      throw new Error("Token not received");
     }
-  };
+
+    if (!user) {
+      throw new Error("User not received from backend");
+    }
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    if (user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Login failed");
+  }
+};
 
   return (
     <div style={{ padding: "40px" }}>
