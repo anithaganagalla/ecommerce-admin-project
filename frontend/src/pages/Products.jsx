@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import API from "../services/api"; 
+import API from "../services/api";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -11,10 +11,19 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         const response = await API.get("/products");
-        setProducts(response.data);
+
+        // Safety check in case API returns undefined
+        if (response && response.data) {
+          setProducts(response.data);
+        } else {
+          setProducts([]);
+        }
       } catch (err) {
         console.error("Products fetch error:", err);
-        setError("Failed to load products");
+        setError(
+          err.response?.data?.message ||
+            "Failed to load products"
+        );
       } finally {
         setLoading(false);
       }
@@ -37,12 +46,19 @@ const Products = () => {
 
   return (
     <div style={{ padding: "40px" }}>
-      <h1 style={{ marginBottom: "30px" }}>Latest Products</h1>
+      <h1 style={{ marginBottom: "30px" }}>
+        Latest Products
+      </h1>
+
+      {products.length === 0 && (
+        <h3>No Products Found</h3>
+      )}
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fill, minmax(250px, 1fr))",
           gap: "25px",
         }}
       >
@@ -53,7 +69,8 @@ const Products = () => {
               border: "1px solid #ddd",
               borderRadius: "10px",
               padding: "15px",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+              boxShadow:
+                "0 4px 10px rgba(0,0,0,0.1)",
               background: "#fff",
             }}
           >
@@ -84,7 +101,10 @@ const Products = () => {
               ₹{product.price}
             </p>
 
-            <Link to={`/product/${product._id}`}>
+            <Link
+              to={`/product/${product._id}`}
+              style={{ textDecoration: "none" }}
+            >
               <button
                 style={{
                   marginTop: "10px",
