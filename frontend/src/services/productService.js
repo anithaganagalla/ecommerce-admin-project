@@ -1,19 +1,48 @@
-import axios from "axios";
+import API from "./api"; // ✅ use centralized axios config
 import { getToken } from "../auth";
 
-const API_URL = "http://localhost:5000/api/products";
+// ✅ Base route (NO localhost)
+const API_URL = "/products";
 
-// GET ALL PRODUCTS (Public)
+/*
+=========================================
+GET ALL PRODUCTS (Public)
+=========================================
+*/
 export const getProducts = async () => {
-  const res = await axios.get(API_URL);
+  const res = await API.get(API_URL);
   return res.data;
 };
 
-// ADD PRODUCT (Admin)
+/*
+=========================================
+GET LATEST PRODUCTS (Public)
+=========================================
+*/
+export const getLatestProducts = async () => {
+  const res = await API.get(`${API_URL}/latest`);
+  return res.data;
+};
+
+/*
+=========================================
+GET PRODUCT BY ID (Public)
+=========================================
+*/
+export const getProductById = async (id) => {
+  const res = await API.get(`${API_URL}/${id}`);
+  return res.data;
+};
+
+/*
+=========================================
+ADD PRODUCT (Admin Only)
+=========================================
+*/
 export const addProduct = async (product) => {
   const token = getToken();
 
-  const res = await axios.post(API_URL, product, {
+  const res = await API.post(API_URL, product, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -22,11 +51,15 @@ export const addProduct = async (product) => {
   return res.data;
 };
 
-// UPDATE PRODUCT
+/*
+=========================================
+UPDATE PRODUCT (Admin Only)
+=========================================
+*/
 export const updateProduct = async (id, product) => {
   const token = getToken();
 
-  const res = await axios.put(`${API_URL}/${id}`, product, {
+  const res = await API.put(`${API_URL}/${id}`, product, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -35,17 +68,15 @@ export const updateProduct = async (id, product) => {
   return res.data;
 };
 
-// GET LATEST PRODUCTS (Public)
-export const getLatestProducts = async () => {
-  const res = await axios.get(`${API_URL}/latest`);
-  return res.data;
-};
-
-// DELETE PRODUCT
+/*
+=========================================
+DELETE PRODUCT (Admin Only)
+=========================================
+*/
 export const deleteProduct = async (id) => {
   const token = getToken();
 
-  const res = await axios.delete(`${API_URL}/${id}`, {
+  const res = await API.delete(`${API_URL}/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
