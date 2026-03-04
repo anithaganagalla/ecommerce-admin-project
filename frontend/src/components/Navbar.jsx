@@ -7,7 +7,17 @@ const Navbar = () => {
   const { cartItems = [] } = useCart();
 
   // ✅ Correct key
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  let user = null;
+
+const storedUser = localStorage.getItem("user");
+
+if (storedUser && storedUser !== "undefined") {
+  try {
+    user = JSON.parse(storedUser);
+  } catch (err) {
+    console.log("User parse error:", err);
+  }
+}
 
   const handleLogout = () => {
     localStorage.removeItem("user");
