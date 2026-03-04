@@ -16,11 +16,15 @@ const ProductDetails = () => {
       try {
         setLoading(true);
 
-        const { data } = await API.get(`/products/${id}`);
+        const response = await API.get(`/products/${id}`);
 
-        setProduct(data);
+        if (response.data) {
+          setProduct(response.data);
+        } else {
+          setError("Product not found");
+        }
       } catch (err) {
-        console.error("Product fetch error:", err);
+        console.log("Product fetch error:", err);
         setError(
           err.response?.data?.message ||
           "Product not found"
@@ -34,8 +38,10 @@ const ProductDetails = () => {
   }, [id]);
 
   if (loading) return <h2>Loading...</h2>;
+
   if (error) return <h2 style={{ color: "red" }}>{error}</h2>;
-  if (!product) return <h2>Product Not Found</h2>;
+
+  if (!product) return <h2>Product not found</h2>;
 
   return (
     <div style={{ padding: "20px" }}>
@@ -56,6 +62,7 @@ const ProductDetails = () => {
       <p>Price: ₹{product.price}</p>
       <p>Category: {product.category}</p>
       <p>Description: {product.description}</p>
+
       <p>
         Stock:
         {product.countInStock > 0
