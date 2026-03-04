@@ -3,6 +3,14 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
 
+/*
+  ✅ Use your production backend
+  ✅ Or use centralized axiosconfig if you have it
+*/
+
+const API_BASE =
+  "https://ecommerce-admin-project-2.onrender.com/api";
+
 const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
@@ -17,13 +25,16 @@ const ProductDetails = () => {
         setLoading(true);
         setError(null);
 
-        const { data } = await axios.get(`/api/products/${id}`);
+        const { data } = await axios.get(
+          `${API_BASE}/products/${id}`
+        );
 
         setProduct(data);
       } catch (err) {
         console.error("Error fetching product:", err);
         setError(
-          err.response?.data?.message || "Failed to load product"
+          err.response?.data?.message ||
+            "Failed to load product"
         );
         setProduct(null);
       } finally {
@@ -41,11 +52,19 @@ const ProductDetails = () => {
   }
 
   if (error) {
-    return <h2 style={{ padding: "20px", color: "red" }}>{error}</h2>;
+    return (
+      <h2 style={{ padding: "20px", color: "red" }}>
+        {error}
+      </h2>
+    );
   }
 
   if (!product) {
-    return <h2 style={{ padding: "20px" }}>Product not found</h2>;
+    return (
+      <h2 style={{ padding: "20px" }}>
+        Product not found
+      </h2>
+    );
   }
 
   return (
@@ -54,7 +73,11 @@ const ProductDetails = () => {
 
       {product.image && (
         <img
-          src={product.image}
+          src={
+            product.image.startsWith("http")
+              ? product.image
+              : `https://ecommerce-admin-project-2.onrender.com${product.image}`
+          }
           alt={product.name}
           width="300"
           style={{ marginBottom: "20px" }}
@@ -70,7 +93,8 @@ const ProductDetails = () => {
       </p>
 
       <p>
-        <strong>Description:</strong> {product.description}
+        <strong>Description:</strong>{" "}
+        {product.description}
       </p>
 
       <p>
@@ -81,19 +105,19 @@ const ProductDetails = () => {
       </p>
 
       <button
-  onClick={() => addToCart(product)}
-  disabled={product.countInStock <= 0}
-  style={{
-    padding: "10px 20px",
-    marginTop: "10px",
-    background: "#111",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer"
-  }}
->
-  Add to Cart
-</button>
+        onClick={() => addToCart(product)}
+        disabled={product.countInStock <= 0}
+        style={{
+          padding: "10px 20px",
+          marginTop: "10px",
+          background: "#111",
+          color: "#fff",
+          border: "none",
+          cursor: "pointer"
+        }}
+      >
+        Add to Cart
+      </button>
     </div>
   );
 };
