@@ -1,17 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-// ✅ Use production backend URL
-const API = axios.create({
-  baseURL: "https://ecommerce-admin-project-2.onrender.com/api",
-});
+import API from "../axiosconfig";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -19,49 +13,25 @@ function Login() {
     setError("");
 
     try {
-      localStorage.clear();
-
-      const res = await API.post("/users/login", {
+      const response = await API.post("/users/login", {
         email,
         password,
       });
 
-      const token = res.data.token;
-      const userData = res.data.user || res.data;
+      const { token, user } = response.data;
 
-      if (!token) {
-        throw new Error("No token received");
-      }
-
-      // Save token
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // Save user
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          _id: userData._id,
-          name: userData.name,
-          email: userData.email,
-          role: userData.role,
-        })
-      );
-
-      console.log("Logged in user:", userData);
-
-      // Role-based redirect
-      if (userData.role === "admin") {
+      if (user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
 
     } catch (err) {
-      console.log(err);
-      setError(
-        err.response?.data?.message ||
-        "Login failed"
-      );
+      console.error(err);
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -75,6 +45,7 @@ function Login() {
         <input
           type="email"
           placeholder="Enter email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -84,6 +55,7 @@ function Login() {
         <input
           type="password"
           placeholder="Enter password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required

@@ -1,18 +1,30 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import API from "../axiosconfig";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const { data } = await axios.get("/api/products");
-      setProducts(data);
+      try {
+        const response = await API.get("/products");
+        setProducts(response.data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProducts();
   }, []);
+
+  if (loading) return <h2 style={{ padding: "40px" }}>Loading...</h2>;
+  if (error) return <h2 style={{ padding: "40px", color: "red" }}>{error}</h2>;
 
   return (
     <div style={{ padding: "40px" }}>
@@ -22,7 +34,7 @@ const Products = () => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: "25px"
+          gap: "25px",
         }}
       >
         {products.map((product) => (
@@ -33,7 +45,6 @@ const Products = () => {
               borderRadius: "10px",
               padding: "15px",
               boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-              transition: "0.3s"
             }}
           >
             <Link to={`/product/${product._id}`}>
@@ -44,7 +55,7 @@ const Products = () => {
                   width: "100%",
                   height: "200px",
                   objectFit: "cover",
-                  borderRadius: "8px"
+                  borderRadius: "8px",
                 }}
               />
             </Link>
@@ -62,7 +73,7 @@ const Products = () => {
                   color: "#fff",
                   border: "none",
                   borderRadius: "5px",
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
               >
                 View Details
