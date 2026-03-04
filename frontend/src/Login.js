@@ -2,6 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// ✅ Use production backend URL
+const API = axios.create({
+  baseURL: "https://ecommerce-admin-project-2.onrender.com/api",
+});
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,10 +21,10 @@ function Login() {
     try {
       localStorage.clear();
 
-      const res = await axios.post(
-        "http://localhost:5000/api/users/login",
-        { email, password }
-      );
+      const res = await API.post("/users/login", {
+        email,
+        password,
+      });
 
       const token = res.data.token;
       const userData = res.data.user || res.data;
