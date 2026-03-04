@@ -1,33 +1,68 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/users";
+/*
+  ✅ Use your centralized API config
+  (axiosconfig.js OR services/api.js)
+*/
 
-// REGISTER
+const API = axios.create({
+  baseURL: "https://ecommerce-admin-project-2.onrender.com/api",
+});
+
+/*
+  ✅ Attach token automatically
+*/
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return req;
+});
+
+
+/*
+  =============================
+  REGISTER
+  =============================
+*/
 export const registerUser = async (userData) => {
-  const response = await axios.post(`${API_URL}/register`, userData);
+  const response = await API.post("/users/register", userData);
   return response.data;
 };
 
-// LOGIN
+
+/*
+  =============================
+  LOGIN
+  =============================
+*/
 export const loginUser = async (userData) => {
-  const response = await axios.post(`${API_URL}/login`, userData);
+  const response = await API.post("/users/login", userData);
 
   if (response.data.token) {
     localStorage.setItem("token", response.data.token);
   }
 
+  if (response.data.user) {
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.user)
+    );
+  }
+
   return response.data;
 };
 
-// GET USERS (Protected)
+
+/*
+  =============================
+  GET USERS (Protected)
+  =============================
+*/
 export const getUsers = async () => {
-  const token = localStorage.getItem("token");
-
-  const response = await axios.get(API_URL, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const response = await API.get("/users");
   return response.data;
 };
