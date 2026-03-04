@@ -8,11 +8,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "./axiosconfig";
 import { getAllUsers, deleteUser } from "./services/adminService";
 import { getAdminStats } from "./services/adminService";
-
-const API_URL = "http://localhost:5000/api";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -30,10 +28,11 @@ const AdminDashboard = () => {
     countInStock: ""
   });
 
+  // ================= CHART DATA =================
   const chartData = orders.map((order, index) => ({
-  name: `Order ${index + 1}`,
-  revenue: order.totalPrice,
-}));
+    name: `Order ${index + 1}`,
+    revenue: order.totalPrice,
+  }));
 
   // ================= FETCH USERS =================
   const fetchUsers = async () => {
@@ -48,7 +47,7 @@ const AdminDashboard = () => {
   // ================= FETCH PRODUCTS =================
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/products`);
+      const { data } = await API.get("/products");
       setProducts(data);
     } catch (error) {
       console.log("Error fetching products:", error);
@@ -58,25 +57,14 @@ const AdminDashboard = () => {
   // ================= FETCH ORDERS =================
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const { data } = await axios.get(`${API_URL}/orders`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
+      const { data } = await API.get("/orders");
       setOrders(data);
     } catch (error) {
       console.log("Error fetching orders:", error);
     }
   };
 
- useEffect(() => {
-  fetchUsers();
-  fetchProducts();
-  fetchOrders();
-
+  // ================= FETCH STATS =================
   const fetchStats = async () => {
     try {
       const data = await getAdminStats();
@@ -86,10 +74,14 @@ const AdminDashboard = () => {
     }
   };
 
-  fetchStats();
-}, []);
+  useEffect(() => {
+    fetchUsers();
+    fetchProducts();
+    fetchOrders();
+    fetchStats();
+  }, []);
 
-  // ================= HANDLE INPUT CHANGE =================
+  // ================= HANDLE INPUT =================
   const handleChange = (e) => {
     setProduct({
       ...product,
@@ -101,39 +93,22 @@ const AdminDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      }
-    };
-
     try {
       if (editingProductId) {
-        await axios.put(
-          `${API_URL}/products/${editingProductId}`,
-          {
-            ...product,
-            price: Number(product.price),
-            countInStock: Number(product.countInStock)
-          },
-          config
-        );
+        await API.put(`/products/${editingProductId}`, {
+          ...product,
+          price: Number(product.price),
+          countInStock: Number(product.countInStock)
+        });
 
         alert("Product updated successfully!");
         setEditingProductId(null);
       } else {
-        await axios.post(
-          `${API_URL}/products`,
-          {
-            ...product,
-            price: Number(product.price),
-            countInStock: Number(product.countInStock)
-          },
-          config
-        );
+        await API.post("/products", {
+          ...product,
+          price: Number(product.price),
+          countInStock: Number(product.countInStock)
+        });
 
         alert("Product added successfully!");
       }
@@ -169,41 +144,23 @@ const AdminDashboard = () => {
     }
   };
 
-  // ================= MARK AS DELIVERED =================
-const handleDeliverOrder = async (id) => {
-  const token = localStorage.getItem("token"); // ✅ correct
+  // ================= MARK ORDER DELIVERED =================
+  const handleDeliverOrder = async (id) => {
+    try {
+      await API.put(`/orders/${id}/deliver`);
+      alert("Order marked as delivered!");
+      fetchOrders();
+    } catch (error) {
+      console.log(error);
+      alert("Failed to update order");
+    }
+  };
 
-  try {
-    await axios.put(
-      `${API_URL}/orders/${id}/deliver`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    alert("Order marked as delivered!");
-    fetchOrders();
-  } catch (error) {
-    console.log(error);
-    alert("Failed to update order");
-  }
-};
-     
   // ================= DELETE PRODUCT =================
   const handleDeleteProduct = async (id) => {
     if (window.confirm("Delete this product?")) {
-      const token = localStorage.getItem("token");
-
       try {
-        await axios.delete(`${API_URL}/products/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        await API.delete(`/products/${id}`);
         fetchProducts();
       } catch (error) {
         console.log(error);
@@ -212,89 +169,84 @@ const handleDeliverOrder = async (id) => {
   };
 
   const cardStyle = {
-  flex: 1,
-  padding: "20px",
-  backgroundColor: "#f4f4f4",
-  borderRadius: "10px",
-  textAlign: "center",
-  boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-};
+    flex: 1,
+    padding: "20px",
+    backgroundColor: "#f4f4f4",
+    borderRadius: "10px",
+    textAlign: "center",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+  };
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Admin Dashboard</h2>
       <hr />
-<h3>Dashboard Overview</h3>
 
-{stats && (
-  <div
-    style={{
-      display: "flex",
-      gap: "20px",
-      marginTop: "20px",
-      marginBottom: "30px"
-    }}
-  >
-    <div style={cardStyle}>
-      <h4>Total Users</h4>
-      <p>{stats.totalUsers}</p>
-    </div>
+      <h3>Dashboard Overview</h3>
 
-    <div style={cardStyle}>
-      <h4>Total Products</h4>
-      <p>{stats.totalProducts}</p>
-    </div>
+      {stats && (
+        <div style={{ display: "flex", gap: "20px", margin: "20px 0 30px 0" }}>
+          <div style={cardStyle}>
+            <h4>Total Users</h4>
+            <p>{stats.totalUsers}</p>
+          </div>
 
-    <div style={cardStyle}>
-      <h4>Total Orders</h4>
-      <p>{stats.totalOrders}</p>
-    </div>
+          <div style={cardStyle}>
+            <h4>Total Products</h4>
+            <p>{stats.totalProducts}</p>
+          </div>
 
-    <div style={cardStyle}>
-      <h4>Total Revenue</h4>
-      <p>₹{stats.totalRevenue}</p>
-    </div>
-  </div>
-)}
+          <div style={cardStyle}>
+            <h4>Total Orders</h4>
+            <p>{stats.totalOrders}</p>
+          </div>
 
-<hr />
-<h3>Revenue Chart</h3>
-
-<div style={{ width: "100%", height: 300 }}>
-  <ResponsiveContainer>
-    <BarChart data={chartData}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
-      <Tooltip />
-      <Bar dataKey="revenue" fill="#8884d8" />
-    </BarChart>
-  </ResponsiveContainer>
-</div>
+          <div style={cardStyle}>
+            <h4>Total Revenue</h4>
+            <p>₹{stats.totalRevenue}</p>
+          </div>
+        </div>
+      )}
 
       <hr />
-      <h3>All Orders:</h3>
-{orders.map((order) => (
-  <div key={order._id} style={{ marginBottom: "10px" }}>
-    Order: {order._id.substring(0, 8)} |
-    User: {order.user?.name} |
-    Total: ₹{order.totalPrice} |
-    Paid: {order.isPaid ? "Yes" : "No"} |
-    Delivered: {order.isDelivered ? "Yes" : "No"}
+      <h3>Revenue Chart</h3>
 
-    {!order.isDelivered && (
-      <button
-        onClick={() => handleDeliverOrder(order._id)}
-        style={{ marginLeft: "10px" }}
-      >
-        Mark Delivered
-      </button>
-    )}
-  </div>
-))}
+      <div style={{ width: "100%", height: 300 }}>
+        <ResponsiveContainer>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="revenue" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
       <hr />
-      <h3>All Users:</h3>
+      <h3>All Orders</h3>
+
+      {orders.map((order) => (
+        <div key={order._id} style={{ marginBottom: "10px" }}>
+          Order: {order._id.substring(0, 8)} |
+          User: {order.user?.name} |
+          Total: ₹{order.totalPrice} |
+          Paid: {order.isPaid ? "Yes" : "No"} |
+          Delivered: {order.isDelivered ? "Yes" : "No"}
+
+          {!order.isDelivered && (
+            <button
+              onClick={() => handleDeliverOrder(order._id)}
+              style={{ marginLeft: "10px" }}
+            >
+              Mark Delivered
+            </button>
+          )}
+        </div>
+      ))}
+
+      <hr />
+      <h3>All Users</h3>
 
       {users.map((user) => (
         <div key={user._id}>
@@ -337,7 +289,7 @@ const handleDeliverOrder = async (id) => {
       </form>
 
       <hr />
-      <h3>All Products:</h3>
+      <h3>All Products</h3>
 
       {products.map((p) => (
         <div key={p._id}>
