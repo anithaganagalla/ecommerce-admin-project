@@ -1,0 +1,88 @@
+Project: MERN E-commerce (MyShop)
+
+Completed:
+- User registration
+- Login with JWT
+- Admin login
+- Admin dashboard
+- Get all users
+- Add product (admin)
+- Delete user (admin)
+
+Backend:
+- Node.js + Express
+- MongoDB
+- JWT auth
+- Role-based admin middleware
+
+Frontend:
+- React
+- Axios
+- LocalStorage token
+
+Current Step:
+Working on admin features and product management.
+
+
+notes:
+Project: MERN E-commerce (MyShop)
+
+Completed:
+- User registration
+- Login with JWT
+- Admin login
+- Admin dashboard
+- Get all users
+- Add product (admin)
+- Delete user (admin)
+
+Backend:
+- Node.js + Express
+- MongoDB
+- JWT auth
+- Role-based admin middleware
+
+Frontend:
+- React
+- Axios
+- LocalStorage token
+
+Current Step:
+Working on admin features and product management.
+
+
+
+
+Project: MERN E-commerce (MyShop). This is a fully functional 
+MERN stack e-commerce application built using Node.js, Express, MongoDB, and React. 
+Completed features include user registration, user login with JWT authentication, admin login, 
+JWT token stored in localStorage, protected backend routes using middleware, 
+role-based admin authorization, frontend AdminRoute protection, and role-based Navbar rendering. 
+Admin features include an Admin Dashboard, get all users, delete user (admin only),
+ create product (admin), update product (admin), delete product (admin), get all products,
+  get single product by ID, admin product edit form, admin product list view, 
+  and stock management using countInStock. User-side features include a modern products grid page, 
+  product details page with dynamic routing (/product/:id), stock display (available/out of stock),
+   and fully functional cart system. Cart system includes add to cart, automatic quantity increment
+    if product already exists, remove from cart, clear cart, total price calculation, 
+cart badge in navbar with live count, cart data stored in localStorage,
+ and cart persistence after page refresh using Context API. Checkout and order system includes
+  checkout page, place order functionality, order saved in MongoDB, order linked to logged-in
+   user, protected order route requiring JWT, and automatic cart clearing after 
+   successful order placement. Backend structure includes models (User, Product, Order),
+    controllers (userController, productController, orderController), 
+    routes (/api/users, /api/products, /api/orders), and middleware (protect, admin). 
+    Frontend structure includes pages (Products, ProductDetails, Cart, Checkout,
+     Login, Dashboard, AdminDashboard), CartContext for global cart state management,
+      Axios for API communication, React Router for navigation, and LocalStorage for 
+      token and cart persistence. Security features implemented include JWT authentication, 
+      protected backend routes, admin-only authorization, token-based API calls, 
+      and role-based UI rendering. Current application flow: user registers or logs in,
+       JWT stored in localStorage, user browses products, adds products to cart,
+        cart persists after refresh, user proceeds to checkout, order saved in MongoDB,
+         cart clears, and admin can manage users and products. 
+         Current status: fully functional MERN e-commerce system with authentication, 
+         role-based access, admin CRUD operations, product catalog, persistent cart system,
+          and order creation. Next planned steps include My Orders page,
+           admin order management panel, mark order as delivered, payment simulation, 
+           image upload integration, deployment, and UI polishing.
