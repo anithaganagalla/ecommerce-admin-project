@@ -13,7 +13,7 @@ const Products = () => {
         const response = await API.get("/products");
         setProducts(response.data);
       } catch (err) {
-        console.error(err);
+        console.error("Products fetch error:", err);
         setError("Failed to load products");
       } finally {
         setLoading(false);
@@ -23,8 +23,17 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  if (loading) return <h2 style={{ padding: "40px" }}>Loading...</h2>;
-  if (error) return <h2 style={{ padding: "40px", color: "red" }}>{error}</h2>;
+  if (loading) {
+    return <h2 style={{ padding: "40px" }}>Loading...</h2>;
+  }
+
+  if (error) {
+    return (
+      <h2 style={{ padding: "40px", color: "red" }}>
+        {error}
+      </h2>
+    );
+  }
 
   return (
     <div style={{ padding: "40px" }}>
@@ -45,23 +54,35 @@ const Products = () => {
               borderRadius: "10px",
               padding: "15px",
               boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+              background: "#fff",
             }}
           >
             <Link to={`/product/${product._id}`}>
-              <img
-                src={product.image}
-                alt={product.name}
-                style={{
-                  width: "100%",
-                  height: "200px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-              />
+              {product.image && (
+                <img
+                  src={
+                    product.image.startsWith("http")
+                      ? product.image
+                      : `https://ecommerce-admin-project-2.onrender.com${product.image}`
+                  }
+                  alt={product.name}
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+              )}
             </Link>
 
-            <h3 style={{ marginTop: "15px" }}>{product.name}</h3>
-            <p style={{ fontWeight: "bold" }}>₹{product.price}</p>
+            <h3 style={{ marginTop: "15px" }}>
+              {product.name}
+            </h3>
+
+            <p style={{ fontWeight: "bold" }}>
+              ₹{product.price}
+            </p>
 
             <Link to={`/product/${product._id}`}>
               <button
