@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import API from "../axiosconfig";
+import API from "../services/api"; 
 
 const Products = () => {
   const [products, setProducts] = useState([]);

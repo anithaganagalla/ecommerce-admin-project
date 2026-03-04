@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import React, { useEffect, useState } from "react";
-import API from "./axiosconfig";
+import API from "./services/api.js";
 import { getAllUsers, deleteUser } from "./services/adminService";
 import { getAdminStats } from "./services/adminService";
 

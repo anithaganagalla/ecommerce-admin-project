@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API from "../axiosconfig"; // ✅ Use your axios config
+import API from "./services/api"; // ✅ Use your axios config
 import { Link } from "react-router-dom";
 
 const ProductList = () => {
