@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create axios instance
 const API = axios.create({
-  baseURL: "https://ecommerce-admin-project-2.onrender.com/api",
+  baseURL: "https://ecommerce-admin-project-2.onrender.com/api"
 });
 
 // Add token automatically to every request
