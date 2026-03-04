@@ -1,21 +1,18 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://ecommerce-admin-project-2.onrender.com/api", // replace with your production URL
+  baseURL: "https://ecommerce-admin-project-2.onrender.com/api",
 });
 
-// Attach token automatically
-API.interceptors.request.use(
-  (req) => {
-    const token = localStorage.getItem("token");
+// ✅ Attach token automatically
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
 
-    if (token) {
-      req.headers.Authorization = `Bearer ${token}`;
-    }
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
 
-    return req;
-  },
-  (error) => Promise.reject(error)
-);
+  return req;
+});
 
 export default API;
